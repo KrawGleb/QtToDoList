@@ -7,11 +7,13 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    tasks = new vector<Task*>();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete[] tasks;
 }
 
 void MainWindow::on_addTaskButton_clicked()
@@ -31,8 +33,10 @@ void MainWindow::onCancelButtonClicked() {
 }
 
 void MainWindow::onAddButtonClicked(Task* task) {
-    this->tasks.push_back(task);
+    this->tasks->push_back(task);
     this->deleteForm();
+
+    TaskItem* taskItem = new TaskItem(task, this);
 }
 
 void MainWindow::deleteForm() {

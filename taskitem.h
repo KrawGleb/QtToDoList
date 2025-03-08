@@ -2,6 +2,7 @@
 #define TASKITEM_H
 
 #include <QWidget>
+#include "task.h"
 
 namespace Ui {
 class TaskItem;
@@ -12,7 +13,7 @@ class TaskItem : public QWidget
     Q_OBJECT
 
 public:
-    explicit TaskItem(QWidget *parent = nullptr);
+    explicit TaskItem(Task* sourceTask, QWidget *parent = nullptr);
     ~TaskItem();
 
 private:

@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "taskform.h"
 #include "task.h"
+#include "taskitem.h"
 
 using namespace std;
 
@@ -29,7 +30,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     TaskForm* taskForm;
-    vector<Task*> tasks;
+    vector<Task*>* tasks;
 
     void deleteForm();
 };
