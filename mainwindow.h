@@ -2,6 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "taskform.h"
+#include "task.h"
+
+using namespace std;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -17,7 +21,16 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void on_addTaskButton_clicked();
+    void onCancelButtonClicked();
+    void onAddButtonClicked(Task* task);
+
 private:
     Ui::MainWindow *ui;
+    TaskForm* taskForm;
+    vector<Task*> tasks;
+
+    void deleteForm();
 };
 #endif // MAINWINDOW_H

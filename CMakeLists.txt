@@ -40,6 +40,8 @@ else()
             ${PROJECT_SOURCES}
             Resourses.qrc
             taskform.h taskform.cpp taskform.ui
+            task.h task.cpp
+            taskitem.h taskitem.cpp taskitem.ui
         )
     endif()
 endif()

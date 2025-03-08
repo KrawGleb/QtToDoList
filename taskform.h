@@ -1,6 +1,7 @@
 #ifndef TASKFORM_H
 #define TASKFORM_H
 
+#include "task.h"
 #include <QWidget>
 
 namespace Ui {
@@ -17,6 +18,14 @@ public:
 
 private:
     Ui::TaskForm *ui;
+
+signals:
+    void onCancelButtonClicked();
+    void onAddButtonClicked(Task* task);
+
+private slots:
+    void on_cancelButton_clicked();
+    void on_addTaskButton_clicked();
 };
 
 #endif // TASKFORM_H
