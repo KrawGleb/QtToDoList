@@ -39,6 +39,7 @@ else()
         add_executable(QtToDoList
             ${PROJECT_SOURCES}
             Resourses.qrc
+            taskform.h taskform.cpp taskform.ui
         )
     endif()
 endif()
