@@ -14,5 +14,8 @@
         <file>assets/signup.png</file>
         <file>assets/task.png</file>
         <file>assets/update.png</file>
+        <file>assets/edit_black.png</file>
+        <file>assets/delete_black.png</file>
+        <file>assets/save_black.png</file>
     </qresource>
 </RCC>

@@ -24,14 +24,19 @@ public:
 
 private slots:
     void on_addTaskButton_clicked();
+
     void onCancelButtonClicked();
+    void onCloseEditForm(TaskForm* taskForm, Task* task);
+
     void onAddButtonClicked(Task* task);
+    void onTaskItemDelete(TaskItem* taskItem);
+    void onTaskItemEdit(TaskItem* taskItem, Task* sourceTask);
 
 private:
     Ui::MainWindow *ui;
     TaskForm* taskForm;
-    vector<Task*>* tasks;
 
     void deleteForm();
+    void connectTaskItem(TaskItem* taskItem);
 };
 #endif // MAINWINDOW_H
