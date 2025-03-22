@@ -7,6 +7,8 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    ui->actionSave->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -51,9 +53,12 @@ void MainWindow::onAddButtonClicked(Task* task) {
 
 void MainWindow::deleteForm() {
     ui->addFormLayout->setVisible(true);
-    ui->formLayout->removeWidget(this->taskForm);
+    if (this->taskForm != nullptr) {
+        ui->formLayout->removeWidget(this->taskForm);
 
-    delete this->taskForm;
+        delete this->taskForm;
+        this->taskForm = nullptr;
+    }
 }
 
 void MainWindow::onTaskItemDelete(TaskItem* taskItem)
@@ -77,3 +82,90 @@ void MainWindow::connectTaskItem(TaskItem* taskItem) {
     connect(taskItem, &TaskItem::onTaskItemDelete, this, &MainWindow::onTaskItemDelete);
     connect(taskItem, &TaskItem::onTaskItemEdit, this, &MainWindow::onTaskItemEdit);
 }
+
+void MainWindow::on_actionOpen_triggered()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, "Open", QDir::homePath(), "*.json");
+    if (fileName.isEmpty()) return;
+    QFile file(fileName);
+
+    if (file.open(QIODevice::ReadOnly)) {
+        this->openedFile = fileName;
+
+        foreach(TaskItem* taskItem, ui->scrollArea->widget()->findChildren<TaskItem*>()) {
+            onTaskItemDelete(taskItem);
+        }
+
+        ui->actionSave->setEnabled(true);
+
+        QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+        int count = 0;
+
+        foreach(QJsonValue value, doc.array()) {
+            QJsonObject object = value.toObject();
+            Task* task = new Task(object);
+            onAddButtonClicked(task);
+            count++;
+        }
+
+
+        file.close();
+
+        QMessageBox::information(this, "Done", QString("Loaded %1 items from %2").arg(QString::number(count), fileName));
+    }
+    else {
+        QMessageBox::critical(this, "Error", QString("Failed to open %1").arg(fileName));
+    }
+}
+
+
+void MainWindow::on_actionSave_as_triggered()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, "Save as...", QDir::homePath(), "*.json");
+    if (fileName.isEmpty()) return;
+
+    if (writeToFile(fileName, QIODevice::WriteOnly)) {
+        QMessageBox::information(this, "Done", QString("Saved items to %2").arg(fileName));
+    }
+    else {
+        QMessageBox::critical(this, "Error", QString("Failed to open %1").arg(fileName));
+    }
+}
+
+void MainWindow::on_actionSave_triggered()
+{
+    if (this->openedFile.isEmpty()) return;
+
+    if (writeToFile(this->openedFile, QIODevice::WriteOnly | QIODevice::Truncate)) {
+        QMessageBox::information(this, "Done", QString("Saved items to %2").arg(this->openedFile));
+    }
+    else {
+        QMessageBox::critical(this, "Error", QString("Failed to open %1").arg(this->openedFile));
+    }
+}
+
+bool MainWindow::writeToFile(QString fileName, QFlags<QIODevice::OpenModeFlag> mode) {
+    QFile file(fileName);
+
+    if (file.open(mode)) {
+        int count = 0;
+        QJsonArray array;
+
+        foreach(TaskItem* taskItem, ui->scrollArea->widget()->findChildren<TaskItem*>()) {
+            array.push_back(taskItem->sourceTask->toJson());
+            count++;
+        }
+
+        QJsonDocument root;
+        root.setArray(array);
+
+        file.write(root.toJson());
+        file.close();
+
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+

@@ -16,6 +16,8 @@ public:
     explicit TaskItem(Task* sourceTask, QWidget *parent = nullptr);
     ~TaskItem();
 
+    Task* sourceTask;
+
 signals:
     void onTaskItemDelete(TaskItem* item);
     void onTaskItemEdit(TaskItem* item, Task* sourceTask);
@@ -27,7 +29,6 @@ private slots:
 
 private:
     Ui::TaskItem *ui;
-    Task* sourceTask;
 };
 
 #endif // TASKITEM_H

@@ -2,6 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QFileDialog>
+#include <qjsondocument.h>
+#include <qjsonarray.h>
+#include <qmessagebox.h>
 #include "taskform.h"
 #include "task.h"
 #include "taskitem.h"
@@ -32,11 +36,19 @@ private slots:
     void onTaskItemDelete(TaskItem* taskItem);
     void onTaskItemEdit(TaskItem* taskItem, Task* sourceTask);
 
+    void on_actionOpen_triggered();
+
+    void on_actionSave_as_triggered();
+
+    void on_actionSave_triggered();
+
 private:
     Ui::MainWindow *ui;
-    TaskForm* taskForm;
+    TaskForm* taskForm = nullptr;
+    QString openedFile;
 
     void deleteForm();
     void connectTaskItem(TaskItem* taskItem);
+    bool writeToFile(QString fileName, QFlags<QIODevice::OpenModeFlag> mode);
 };
 #endif // MAINWINDOW_H
