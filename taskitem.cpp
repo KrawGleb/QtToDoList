@@ -24,8 +24,18 @@ void TaskItem::on_deleteButton_clicked()
     emit onTaskItemDelete(this);
 }
 
-
 void TaskItem::on_editButton_clicked()
 {
     emit onTaskItemEdit(this, this->sourceTask);
+}
+
+QJsonObject TaskItem::toJson()
+{
+    QJsonObject jsonObject;
+    jsonObject["title"] = this->sourceTask->title;
+    jsonObject["description"] = this->sourceTask->description;
+    jsonObject["dateTime"] = this->sourceTask->dateTime.toString("yyyy.MM.dd HH:mm:ss");
+    jsonObject["priority"] = this->sourceTask->priority;
+
+    return jsonObject;
 }

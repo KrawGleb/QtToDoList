@@ -2,6 +2,7 @@
 #define TASKITEM_H
 
 #include <QWidget>
+#include <QJsonObject>
 #include "task.h"
 
 namespace Ui {
@@ -15,6 +16,8 @@ class TaskItem : public QWidget
 public:
     explicit TaskItem(Task* sourceTask, QWidget *parent = nullptr);
     ~TaskItem();
+
+    QJsonObject toJson();
 
 signals:
     void onTaskItemDelete(TaskItem* item);

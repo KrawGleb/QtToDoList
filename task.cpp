@@ -8,3 +8,10 @@ Task::Task(QString title, QString description, QDateTime dateTime, int priority)
     this->dateTime = dateTime;
     this->priority = priority;
 }
+
+Task::Task(QJsonObject json) {
+    this->title = json["title"].toString();
+    this->description = json["description"].toString();
+    this->dateTime = QDateTime::fromString(json["dateTime"].toString(), "yyyy.MM.dd HH:mm:ss");
+    this->priority = json["priority"].toInt();
+}
