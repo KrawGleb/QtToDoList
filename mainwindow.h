@@ -3,6 +3,10 @@
 
 #include <QMainWindow>
 #include <QFileDialog>
+#include <qsqldatabase.h>
+#include <qsqlquery.h>
+#include <qsqltablemodel.h>
+#include <qsqlrecord.h>
 #include <qjsondocument.h>
 #include <qjsonarray.h>
 #include <qmessagebox.h>

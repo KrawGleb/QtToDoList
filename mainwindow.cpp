@@ -85,36 +85,62 @@ void MainWindow::connectTaskItem(TaskItem* taskItem) {
 
 void MainWindow::on_actionOpen_triggered()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, "Open", QDir::homePath(), "*.json");
+    QString fileName = QFileDialog::getOpenFileName(this, "Open", QDir::homePath(), "*.json, *.db");
     if (fileName.isEmpty()) return;
-    QFile file(fileName);
 
-    if (file.open(QIODevice::ReadOnly)) {
-        this->openedFile = fileName;
+    QString format = fileName.split('.').last();
 
-        foreach(TaskItem* taskItem, ui->scrollArea->widget()->findChildren<TaskItem*>()) {
-            onTaskItemDelete(taskItem);
+    if (format == "json") {
+        QFile file(fileName);
+
+        if (file.open(QIODevice::ReadOnly)) {
+            this->openedFile = fileName;
+
+            foreach(TaskItem* taskItem, ui->scrollArea->widget()->findChildren<TaskItem*>()) {
+                onTaskItemDelete(taskItem);
+            }
+
+            ui->actionSave->setEnabled(true);
+
+            QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+            int count = 0;
+
+            foreach(QJsonValue value, doc.array()) {
+                QJsonObject object = value.toObject();
+                Task* task = new Task(object);
+                onAddButtonClicked(task);
+                count++;
+            }
+
+
+            file.close();
+
+            QMessageBox::information(this, "Done", QString("Loaded %1 items from %2").arg(QString::number(count), fileName));
         }
-
-        ui->actionSave->setEnabled(true);
-
-        QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
-        int count = 0;
-
-        foreach(QJsonValue value, doc.array()) {
-            QJsonObject object = value.toObject();
-            Task* task = new Task(object);
-            onAddButtonClicked(task);
-            count++;
+        else {
+            QMessageBox::critical(this, "Error", QString("Failed to open %1").arg(fileName));
         }
-
-
-        file.close();
-
-        QMessageBox::information(this, "Done", QString("Loaded %1 items from %2").arg(QString::number(count), fileName));
     }
-    else {
-        QMessageBox::critical(this, "Error", QString("Failed to open %1").arg(fileName));
+    else if (format == "db") {
+        QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+        db.setDatabaseName(fileName);
+        if (db.open()) {
+            QSqlTableModel* tableModel = new QSqlTableModel(this, db);
+            tableModel->setTable("Tasks");
+            tableModel->select();
+            int rowCount = tableModel->rowCount();
+
+            for (int i = 0; i < rowCount; ++i) {
+                qDebug() << tableModel->record(i).value("Title").toString();
+            }
+
+            delete tableModel;
+        }
+        else {
+            QMessageBox::critical(this, "Error", QString("Failed to open %1").arg(fileName));
+            return;
+        }
+
     }
 }
 
@@ -146,7 +172,6 @@ void MainWindow::on_actionSave_triggered()
 
 bool MainWindow::writeToFile(QString fileName, QFlags<QIODevice::OpenModeFlag> mode) {
     QFile file(fileName);
-
     if (file.open(mode)) {
         int count = 0;
         QJsonArray array;
