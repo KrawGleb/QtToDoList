@@ -85,7 +85,22 @@ void MainWindow::connectTaskItem(TaskItem* taskItem) {
 
 void MainWindow::on_actionOpen_triggered()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, "Open", QDir::homePath(), "*.json");
+    QString fileName = QFileDialog::getOpenFileName(this, "Open", QDir::homePath(), "*.json, *.db");
+    QString format = fileName.split('.').last();
+
+    if (format == "json") {
+        readJsonFile(fileName);
+    }
+    else if (format == "db") {
+        readDatabase(fileName);
+    }
+    else {
+        QMessageBox::critical(this, "Error", QString("Unsupported format %1").arg(format));
+    }
+}
+
+
+void MainWindow::readJsonFile(QString fileName) {
     if (fileName.isEmpty()) return;
     QFile file(fileName);
 
@@ -108,7 +123,6 @@ void MainWindow::on_actionOpen_triggered()
             count++;
         }
 
-
         file.close();
 
         QMessageBox::information(this, "Done", QString("Loaded %1 items from %2").arg(QString::number(count), fileName));
@@ -118,6 +132,33 @@ void MainWindow::on_actionOpen_triggered()
     }
 }
 
+void MainWindow::readDatabase(QString fileName) {
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName(fileName);
+    if (db.open()) {
+        QSqlTableModel* model = new QSqlTableModel(this, db);
+        model->setTable("Tasks");
+        model->select();
+
+        int rowCount = model->rowCount();
+        int count = 0;
+
+        for (int index = 0; index < rowCount; ++index) {
+            QSqlRecord record = model->record(index);
+            Task* task = new Task(record);
+            onAddButtonClicked(task);
+            count++;
+        }
+
+        delete model;
+        db.close();
+
+        QMessageBox::information(this, "Done", QString("Loaded %1 items from %2").arg(QString::number(count), fileName));
+    }
+    else {
+        QMessageBox::critical(this, "Error", QString("Failed to open %1").arg(fileName));
+    }
+}
 
 void MainWindow::on_actionSave_as_triggered()
 {

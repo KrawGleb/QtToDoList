@@ -16,6 +16,13 @@ Task::Task(QJsonObject json) {
     this->priority = json["priority"].toInt();
 }
 
+Task::Task(QSqlRecord record) {
+    this->title = record.value("Title").toString();
+    this->description = record.value("Description").toString();
+    this->dateTime = QDateTime::fromString(record.value("DateTime").toString(), "yyyy.MM.dd HH:mm:ss");
+    this->priority = record.value("priority").toInt();
+}
+
 QJsonObject Task::toJson() {
     QJsonObject result;
 

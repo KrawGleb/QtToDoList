@@ -6,6 +6,9 @@
 #include <qjsondocument.h>
 #include <qjsonarray.h>
 #include <qmessagebox.h>
+#include <qsqldatabase.h>
+#include <qsqltablemodel.h>
+#include <qsqlrecord.h>
 #include "taskform.h"
 #include "task.h"
 #include "taskitem.h"
@@ -50,5 +53,7 @@ private:
     void deleteForm();
     void connectTaskItem(TaskItem* taskItem);
     bool writeToFile(QString fileName, QFlags<QIODevice::OpenModeFlag> mode);
+    void readJsonFile(QString fileName);
+    void readDatabase(QString fileName);
 };
 #endif // MAINWINDOW_H
